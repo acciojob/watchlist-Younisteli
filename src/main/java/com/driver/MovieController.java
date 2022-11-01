@@ -60,6 +60,8 @@ public class MovieController {
             movieList = e.getValue();
 
         }
+        // list of Movies
+
         List<String> movieNames = new ArrayList<>();
         for(Movie m : movieList){
             movieNames.add(m.getName());
