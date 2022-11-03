@@ -8,6 +8,7 @@ import org.springframework.web.bind.annotation.*;
 import java.util.*;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 
 
 @RestController
@@ -15,7 +16,7 @@ import java.util.Map;
 public class MovieController {
     @Autowired
     MovieService movieService;
-    Map<String,List<Movie>> directorMoviepair = new HashMap<>();
+    Map<String,List<Movie>> directorMoviepair = new ConcurrentHashMap<>();
     @PostMapping("/add-movie")
     public ResponseEntity addMovie(@RequestBody Movie movie){
         movieService.addMovie(movie);
@@ -50,15 +51,15 @@ public class MovieController {
     @GetMapping("/get-director-by-name/{name}")
     public  ResponseEntity<Director> getDirectorByName(@PathVariable("name") String name){
         Director d = movieService.getDirectorByDirectorName(name);
-       return new ResponseEntity<>(d, HttpStatus.OK);
+        return new ResponseEntity<>(d, HttpStatus.OK);
     }
 
-    @GetMapping("/get-movies-by-director-name/{director}")
-    public  ResponseEntity<List<String>> getMoviesByDirectorName(@PathVariable("name") String dname){
+    @GetMapping("/get-movies-by-director-name/{name}")
+    public  ResponseEntity<List<String>> getMoviesByDirectorName(@PathVariable String name){
         List<Movie> movieList = new ArrayList<>();
         for(Map.Entry<String, List<Movie>> e: directorMoviepair.entrySet()){
-            if(e.getKey().equals(dname));
-            movieList = e.getValue();
+            if(e.getKey().equals(name))
+                movieList = e.getValue();
 
         }
         // done
@@ -75,16 +76,14 @@ public class MovieController {
     public ResponseEntity deleteDirectorByName(@RequestParam String name){
         List<Movie> movieList = new ArrayList<>();
         for(Map.Entry<String, List<Movie>> e: directorMoviepair.entrySet()){
-            if(e.getKey().equals(name));
-            movieService.deleteDirector(name);
-            movieList=e.getValue();
-            for(Movie m : movieList){
-                movieService.deleteMovie(m.getName());
-
+            if(e.getKey().equals(name)){
+                movieService.deleteDirector(name);
+                movieList=e.getValue();
+                for(Movie m : movieList){
+                    movieService.deleteMovie(m.getName());
+                }
+                directorMoviepair.remove(e.getKey());
             }
-            directorMoviepair.remove(e.getKey());
-
-
         }
         return new ResponseEntity<>("Success", HttpStatus.OK);
     }
