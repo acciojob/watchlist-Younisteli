@@ -37,8 +37,9 @@ public class MovieController {
     public  ResponseEntity addMovieDirectorPair(@RequestParam String MName,String DName){
         Movie movie = movieService.getMovieByName(MName);
         for(Map.Entry<String, List<Movie>> e: directorMoviepair.entrySet()){
-            if(e.getKey().equals(DName));
-            directorMoviepair.get(DName).add(movie);
+            if(e.getKey().equals(DName)) {
+                directorMoviepair.get(DName).add(movie);
+            }
         }
         return new ResponseEntity<>("success", HttpStatus.OK);
     }
@@ -50,27 +51,26 @@ public class MovieController {
 
     @GetMapping("/get-director-by-name/{name}")
     public  ResponseEntity<Director> getDirectorByName(@PathVariable("name") String name){
-        Director d = movieService.getDirectorByDirectorName(name);
+        Director d = movieService.getDirectorByName(name);
         return new ResponseEntity<>(d, HttpStatus.OK);
     }
 
-    @GetMapping("/get-movies-by-director-name/{name}")
-    public  ResponseEntity<List<String>> getMoviesByDirectorName(@PathVariable("name") String name){
-        List<Movie> movieList = new ArrayList<>();
-        for(Map.Entry<String, List<Movie>> e: directorMoviepair.entrySet()){
-            if(e.getKey().equals(name)) {
-                movieList = e.getValue();
+    @GetMapping("/get-movies-by-director-name/{director}")
+    public  ResponseEntity<List<String>> getMoviesByDirectorName(@PathVariable("director") String director){
+        List<Movie> listMovies = new ArrayList<>();
+        for(Map.Entry<String , List<Movie>> entry: directorMoviepair.entrySet()){
+            if(entry.getKey().equals(director)){
+                listMovies = entry.getValue();
+
             }
-
         }
-        // done
-
-        List<String> movieNames = new ArrayList<>();
-        for(Movie m : movieList){
-            movieNames.add(m.getName());
-
+        List<String> movieNamesList =new ArrayList<>();
+        for(Movie movie: listMovies){
+            movieNamesList.add(movie.getName());
         }
-        return new ResponseEntity<>(movieNames, HttpStatus.OK);
+
+        return new ResponseEntity<>(movieNamesList, HttpStatus.OK);
+
     }
     @DeleteMapping("/delete-movie-by-name/{name}")
     public ResponseEntity deleteMovieByName(@PathVariable("name") String name){
@@ -103,14 +103,9 @@ public class MovieController {
                 movieService.deleteMovie(m.getName());
 
             }
-            directorMoviepair.remove(e.getKey());
-
-
         }
         return new ResponseEntity<>("Success", HttpStatus.OK);
 
     }
-
-
 
 }

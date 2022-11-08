@@ -35,7 +35,7 @@ public class MovieRepository {
         }
         return movieList;
     }
-    Director getDirectorByDirectorName(String name){
+    Director getDirectorByName(String name){
         for(Director d: Directors){
             if(d.getName().equals(name)){
                 return d;
