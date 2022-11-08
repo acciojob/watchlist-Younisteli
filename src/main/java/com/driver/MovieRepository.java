@@ -63,7 +63,7 @@ public class MovieRepository {
         }
     }
     void  deleteAllDirectors(){
-        Directors = new ArrayList<>();
+        Directors.clear();
     }
 
 }
